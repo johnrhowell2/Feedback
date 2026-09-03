@@ -353,6 +353,17 @@
         starsEl.appendChild(star);
       }
 
+      // Pre-select rating from URL parameter (e.g. ?rating=4)
+      var urlRating = parseInt(new URLSearchParams(window.location.search).get('rating'));
+      if (urlRating >= 1 && urlRating <= 5) {
+        state.rating = urlRating;
+        var allStars = starsEl.querySelectorAll('.star');
+        for (var j = 0; j < allStars.length; j++) {
+          allStars[j].classList.toggle('active', j < urlRating);
+        }
+        document.getElementById('rating-label').textContent = ratingLabels[urlRating];
+      }
+
       starsEl.addEventListener('click', function(e) {
         var star = e.target.closest('.star');
         if (!star) return;
