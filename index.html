@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Service Feedback - John Howell</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --star-empty: #cbd5e1;
+      --star-filled: #f59e0b;
+      --accent: #059669;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary: #60a5fa;
+        --primary-light: #93c5fd;
+        --bg: #0f172a;
+        --surface: #1e293b;
+        --text: #e2e8f0;
+        --text-muted: #94a3b8;
+        --border: #334155;
+        --star-empty: #475569;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 520px;
+      width: 100%;
+      padding: clamp(24px, 5vw, 40px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .header .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .section-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /* Star rating */
+    .stars {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .star {
+      cursor: pointer;
+      width: 44px;
+      height: 44px;
+      transition: transform 0.15s ease;
+    }
+
+    .star:hover { transform: scale(1.15); }
+
+    .star svg {
+      width: 100%;
+      height: 100%;
+      fill: var(--star-empty);
+      transition: fill 0.15s ease;
+    }
+
+    .star.active svg { fill: var(--star-filled); }
+
+    .rating-label {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 8px;
+      min-height: 1.2em;
+    }
+
+    /* Multiple choice */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 0.95rem;
+    }
+
+    .option:hover { border-color: var(--primary-light); }
+
+    .option.selected {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.06);
+    }
+
+    .option input { display: none; }
+
+    .radio-dot {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s;
+    }
+
+    .radio-dot::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      transform: scale(0);
+      transition: transform 0.15s;
+    }
+
+    .option.selected .radio-dot {
+      border-color: var(--primary);
+    }
+
+    .option.selected .radio-dot::after {
+      transform: scale(1);
+    }
+
+    /* Text inputs */
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .input-group input, .input-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+
+    .input-group input:focus, .input-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-light);
+    }
+
+    .input-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .optional-tag {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover { opacity: 0.9; }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Thank you state */
+    .thank-you {
+      text-align: center;
+      display: none;
+    }
+
+    .thank-you .checkmark {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thank-you .checkmark svg {
+      width: 32px;
+      height: 32px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .thank-you h2 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+
+    .thank-you p {
+      color: var(--text-muted);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <!-- Survey form -->
+    <div id="survey-form">
+      <div class="header">
+        <h1>Please take a moment to fill out below!</h1>
+        <p class="subtitle">How did John Howell do regarding your request?</p>
+      </div>
+
+      <!-- Star Rating -->
+      <div class="section">
+        <span class="section-label">Overall Rating</span>
+        <div class="stars" id="stars"></div>
+        <div class="rating-label" id="rating-label"></div>
+      </div>
+
+      <!-- Discipline/BU -->
+      <div class="section">
+        <span class="section-label">From which discipline/BU did you request Completions data?</span>
+        <div class="options" id="discipline-options"></div>
+      </div>
+
+      <!-- Future requests -->
+      <div class="section">
+        <span class="section-label">Will you request information/data from Completions in the future?</span>
+        <div class="options" id="future-options"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Optional contact -->
+      <div class="section">
+        <span class="section-label">Your info <span class="optional-tag">(optional)</span></span>
+        <div class="input-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Your name" />
+        </div>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" />
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="section">
+        <span class="section-label">Additional comments <span class="optional-tag">(optional)</span></span>
+        <div class="input-group">
+          <textarea id="comments" placeholder="Please add any additional information regarding your Completions experience."></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" disabled>Submit Feedback</button>
+    </div>
+
+    <!-- Thank you -->
+    <div class="thank-you" id="thank-you">
+      <div class="checkmark">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h2>Thank you!</h2>
+      <p>Your feedback has been submitted.</p>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var state = { rating: 0, discipline: '', future: '' };
+      var ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+
+      // Build stars
+      var starsEl = document.getElementById('stars');
+      for (var i = 1; i <= 5; i++) {
+        var star = document.createElement('div');
+        star.className = 'star';
+        star.dataset.value = i;
+        star.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+        starsEl.appendChild(star);
+      }
+
+      starsEl.addEventListener('click', function(e) {
+        var star = e.target.closest('.star');
+        if (!star) return;
+        state.rating = parseInt(star.dataset.value);
+        var allStars = starsEl.querySelectorAll('.star');
+        for (var j = 0; j < allStars.length; j++) {
+          allStars[j].classList.toggle('active', j < state.rating);
+        }
+        document.getElementById('rating-label').textContent = ratingLabels[state.rating];
+        checkReady();
+      });
+
+      // Build multiple choice groups
+      function buildOptions(containerId, choices, stateKey) {
+        var container = document.getElementById(containerId);
+        choices.forEach(function(text) {
+          var label = document.createElement('label');
+          label.className = 'option';
+          label.innerHTML = '<input type="radio" name="' + stateKey + '" value="' + text + '"><span class="radio-dot"></span><span>' + text + '</span>';
+          container.appendChild(label);
+          label.addEventListener('click', function() {
+            state[stateKey] = text;
+            var siblings = container.querySelectorAll('.option');
+            for (var k = 0; k < siblings.length; k++) {
+              siblings[k].classList.remove('selected');
+            }
+            label.classList.add('selected');
+            checkReady();
+          });
+        });
+      }
+
+      buildOptions('discipline-options', ['Haynesville', 'NE Appalachia', 'SW Appalachia', 'Accounting', 'Regulatory', 'Other'], 'discipline');
+      buildOptions('future-options', ['Yes, definitely', 'Probably', 'Maybe', 'Maybe not', "We'll see"], 'future');
+
+      // Enable submit when required fields filled
+      function checkReady() {
+        document.getElementById('submit-btn').disabled = !(state.rating && state.discipline && state.future);
+      }
+
+      // Submit via mailto
+      document.getElementById('submit-btn').addEventListener('click', function() {
+        var name = document.getElementById('name').value.trim();
+        var email = document.getElementById('email').value.trim();
+        var comments = document.getElementById('comments').value.trim();
+
+        var body = 'Service Feedback for John Howell\n';
+        body += '================================\n\n';
+        body += 'Overall Rating: ' + state.rating + '/5 (' + ratingLabels[state.rating] + ')\n';
+        body += 'Discipline/BU: ' + state.discipline + '\n';
+        body += 'Future Requests: ' + state.future + '\n';
+        if (name) body += '\nName: ' + name;
+        if (email) body += '\nEmail: ' + email;
+        if (comments) body += '\n\nComments:\n' + comments;
+
+        var mailto = 'mailto:john.howell@expandenergy.com'
+          + '?subject=' + encodeURIComponent('Service Feedback - ' + ratingLabels[state.rating])
+          + '&body=' + encodeURIComponent(body);
+
+        window.location.href = mailto;
+
+        // Show thank you
+        document.getElementById('survey-form').style.display = 'none';
+        document.getElementById('thank-you').style.display = 'block';
+      });
+    })();
+  </script>
+
+</body>
+</html>
